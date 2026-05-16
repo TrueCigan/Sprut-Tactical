@@ -1,1 +1,1 @@
-# lethimcook12k.com
+# Sprut-Tactical.com
