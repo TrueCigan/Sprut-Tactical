@@ -134,12 +134,16 @@
 
     /* ── HERO ── */
     #home {
-      min-height: 100vh;
-      padding: 64px 5% 0;
+      min-height: auto;
+      padding: 72px 5% 36px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 4rem;
+      grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
+      grid-template-areas:
+        "content featured"
+        "stats featured";
+      align-items: start;
+      column-gap: 2rem;
+      row-gap: 1.25rem;
       position: relative;
       overflow: hidden;
     }
@@ -163,9 +167,10 @@
     }
 
     .hero-content {
+      grid-area: content;
       position: relative;
       z-index: 2;
-      padding: 30px 0 80px;
+      padding: 20px 0 0;
     }
 
     .section-label {
@@ -190,10 +195,10 @@
 
     h1 {
       font-family: var(--font-display);
-      font-size: clamp(3.5rem, 7vw, 6rem);
+      font-size: clamp(2.8rem, 6vw, 5rem);
       line-height: 0.95;
       letter-spacing: 2px;
-      margin-bottom: 1rem;
+      margin-bottom: 0.65rem;
     }
 
     h1 .white { color: var(--text); }
@@ -201,10 +206,10 @@
 
     .hero-sub {
       font-family: var(--font-display);
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
       letter-spacing: 3px;
       color: var(--text2);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .hero-desc {
@@ -212,7 +217,7 @@
       color: var(--text2);
       font-size: 1rem;
       line-height: 1.7;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .hero-buttons {
@@ -261,26 +266,30 @@
     .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
     .hero-stats {
+      grid-area: stats;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
       border-radius: 4px;
-      margin-top: 3rem;
+      margin-top: 0;
       overflow: hidden;
       max-width: 420px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
     }
 
     .stat {
       background: var(--surface);
-      padding: 20px 16px;
+      padding: 14px 12px;
       text-align: center;
     }
 
     .stat-num {
       font-family: var(--font-display);
-      font-size: 2rem;
+      font-size: 1.7rem;
       letter-spacing: 1px;
       color: var(--accent);
       display: block;
@@ -296,23 +305,25 @@
     }
 
     .hero-visual {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute;
+      right: 2%;
+      top: 50%;
+      transform: translateY(-58%);
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.22;
+      width: min(420px, 38vw);
     }
 
     .hero-radar {
-      width: 420px;
-      height: 420px;
-      position: relative;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
     }
 
     .hero-radar svg {
       width: 100%;
       height: 100%;
-      opacity: 0.7;
     }
 
     /* ── SECTIONS COMMON ── */
@@ -782,7 +793,7 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      #home { grid-template-columns: 1fr; }
+      #home { grid-template-columns: 1fr; padding-bottom: 20px; }
       .hero-visual { display: none; }
       .hero-stats { grid-template-columns: repeat(2, 1fr); }
       .features-grid { grid-template-columns: 1fr; }
@@ -1007,6 +1018,200 @@
       padding: 5px 9px;
       border-radius: 2px;
       line-height: 1.2;
+    }
+
+    /* ── FEATURED BESTSELLERS ── */
+    #featured {
+      grid-area: featured;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      align-self: start;
+      padding-top: 12px;
+    }
+
+    .featured-header {
+      margin: 0 0 0.75rem;
+    }
+
+    .featured-header .section-label {
+      margin-bottom: 0.5rem;
+    }
+
+    .featured-header h2 {
+      font-size: clamp(1.2rem, 2vw, 1.55rem);
+      margin-bottom: 0;
+    }
+
+    .featured-header p {
+      max-width: 100%;
+      color: var(--text2);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-top: 0.25rem;
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .featured-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      min-height: 0;
+    }
+
+    .featured-img {
+      position: relative;
+      background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
+      min-height: 100%;
+    }
+
+    .featured-img img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 1;
+      font-family: var(--font-heading);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      background: var(--accent2);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 2px;
+    }
+
+    .featured-body {
+      padding: 12px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .featured-body h3 {
+      font-family: var(--font-heading);
+      font-size: 0.98rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .featured-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 8px;
+    }
+
+    .featured-spec {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 5px 7px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .featured-spec strong {
+      font-family: var(--font-heading);
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .featured-spec span {
+      font-size: 0.78rem;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .featured-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+    }
+
+    .featured-meta .product-price {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+
+    .featured-meta .qc-badge {
+      margin-top: 0;
+    }
+
+    .featured-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .featured-actions .btn-primary,
+    .featured-actions .btn-secondary {
+      padding: 8px 12px;
+      font-size: 0.68rem;
+      letter-spacing: 1.2px;
+    }
+
+    .featured-actions a.btn-secondary,
+    .featured-actions button.btn-secondary {
+      background: transparent;
+    }
+
+    @media (max-width: 900px) {
+      #home {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "content"
+          "featured"
+          "stats";
+      }
+      .hero-visual { display: none; }
+      .featured-card { grid-template-columns: 110px 1fr; }
+      .featured-img { min-height: 140px; }
+      #featured { padding-top: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .featured-card { grid-template-columns: 96px 1fr; }
+      .featured-img { min-height: 130px; }
+      .featured-body { padding: 10px; gap: 6px; }
+      .featured-body h3 { font-size: 0.88rem; }
+      .featured-specs { grid-template-columns: 1fr 1fr; gap: 4px; }
+      .featured-spec { padding: 4px 6px; }
+      .featured-spec span { font-size: 0.72rem; }
+      .featured-actions .btn-primary,
+      .featured-actions .btn-secondary {
+        flex: 1 1 auto;
+        justify-content: center;
+        text-align: center;
+        padding: 8px 10px;
+      }
     }
 
     /* ── QUALITY CONTROL ── */
@@ -1605,16 +1810,16 @@
       <a href="#catalog" class="btn-primary">Каталог продукції →</a>
       <a href="#contacts" class="btn-secondary">Зв'язатися з нами</a>
     </div>
+  </div>
 
-    <div class="hero-stats fade-in">
-      <div class="stat">
-        <span class="stat-num">25</span>
-        <span class="stat-label">Років досвіду</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">50+</span>
-        <span class="stat-label">Реалізованих проєктів</span>
-      </div>
+  <div class="hero-stats fade-in">
+    <div class="stat">
+      <span class="stat-num">25</span>
+      <span class="stat-label">Років досвіду</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">50+</span>
+      <span class="stat-label">Реалізованих проєктів</span>
     </div>
   </div>
 
@@ -1659,6 +1864,16 @@
         <circle cx="200" cy="200" r="3" fill="#3d6b47"/>
       </svg>
     </div>
+  </div>
+
+  <!-- Featured bestsellers sit in the hero so they appear on the first screen -->
+  <div id="featured">
+    <div class="featured-header fade-in">
+      <div class="section-label">ХІТИ ПРОДАЖІВ // 00.2</div>
+      <h2>ОСНОВНІ МОДЕЛІ ДЛЯ ВИРОБНИКІВ</h2>
+      <p>Дві рупорні антени, з яких складається основний обсяг поставок для виробників дронів і телеком-станцій.</p>
+    </div>
+    <div class="featured-grid fade-in" id="featuredGrid"></div>
   </div>
 </section>
 
@@ -1888,6 +2103,13 @@
 
   // openModal replaced by cart system below
 
+  // Featured bestsellers: product id + exact variant label from `products`.
+  // Specs/price/datasheet are resolved from catalog data so admin edits stay in sync.
+  const featuredBestsellers = [
+    { id: 'ant1', variant: '18 dBi', badge: 'Хіт продажів' },
+    { id: 'ant2', variant: '16 dBi', badge: 'Основна модель' }
+  ];
+
   function closeModal(e) {
     if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
   }
@@ -1940,12 +2162,20 @@
     return n.toLocaleString('uk-UA') + ' ₴';
   }
 
-  function openModal(id) {
+  function openModal(id, variantHint) {
     const p = products[id];
     if (!p) return;
     currentModalId = id;
     currentVariantIndex = 0;
     currentPolarizationIndex = 0;
+    if (p.variants && p.variants.length && variantHint != null && variantHint !== '') {
+      if (typeof variantHint === 'number') {
+        if (variantHint >= 0 && variantHint < p.variants.length) currentVariantIndex = variantHint;
+      } else {
+        const idx = p.variants.findIndex(v => v.label === variantHint);
+        if (idx >= 0) currentVariantIndex = idx;
+      }
+    }
     document.getElementById('modalTag').textContent = p.tag;
     document.getElementById('modalTitle').textContent = p.title;
     document.getElementById('modalDesc').textContent = p.desc;
@@ -2242,6 +2472,79 @@
       setTimeout(() => { btn.textContent = 'Відправити замовлення →'; }, 3000);
     }
   }
+
+  // ── FEATURED BESTSELLERS (driven by products + catalog card photos) ──
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function getCatalogCardImage(id) {
+    const card = document.querySelector(`.product-card[onclick*="'${id}'"] img`);
+    return card ? card.getAttribute('src') : '';
+  }
+
+  function featuredSpecsForVariant(product, variant) {
+    const specs = [];
+    // Prefer the primary frequency line from catalog specs (exact values only).
+    const freq = (product.specs || []).find(s => /діапазон|частот/i.test(s.label));
+    if (freq) specs.push({ label: freq.label, value: freq.value });
+    // Gain always comes from the featured variant label (exact catalog variant).
+    specs.push({ label: 'Підсилення', value: variant.label });
+    (product.specs || []).forEach(s => {
+      if (/потужність|вага/i.test(s.label)) {
+        specs.push({ label: s.label, value: s.value });
+      }
+    });
+    return specs;
+  }
+
+  function renderFeaturedBestsellers() {
+    const grid = document.getElementById('featuredGrid');
+    if (!grid || !Array.isArray(featuredBestsellers)) return;
+
+    grid.innerHTML = featuredBestsellers.map(item => {
+      const p = products[item.id];
+      if (!p || !p.variants) return '';
+      const variantIndex = p.variants.findIndex(v => v.label === item.variant);
+      if (variantIndex < 0) return '';
+      const variant = p.variants[variantIndex];
+      const img = getCatalogCardImage(item.id);
+      const datasheet = (p.datasheets && p.datasheets[variantIndex]) ? p.datasheets[variantIndex] : '';
+      const hasPrice = variant.price !== undefined && variant.price !== null && variant.price !== '';
+      const specs = featuredSpecsForVariant(p, variant);
+      const name = `${p.title}, ${variant.label}`;
+      const showQc = p.tag === 'Антени' && !/розробк/i.test(p.title || '');
+
+      return `
+      <article class="featured-card">
+        <div class="featured-img">
+          ${item.badge ? `<span class="featured-badge">${escapeHtml(item.badge)}</span>` : ''}
+          ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(name)}" loading="lazy">` : ''}
+        </div>
+        <div class="featured-body">
+          <h3>${escapeHtml(name)}</h3>
+          <div class="featured-specs">
+            ${specs.map(s => `<div class="featured-spec"><strong>${escapeHtml(s.label)}</strong><span>${escapeHtml(s.value)}</span></div>`).join('')}
+          </div>
+          <div class="featured-meta">
+            ${hasPrice ? `<span class="product-price">${escapeHtml(fmtPrice(variant.price))}</span>` : ''}
+            ${showQc ? `<span class="qc-badge">✓ Перевірено на R&amp;S ZNH18</span>` : ''}
+          </div>
+          <div class="featured-actions">
+            <button type="button" class="btn-secondary" onclick="openModal('${item.id}', '${escapeHtml(variant.label)}')">Детальніше</button>
+            ${datasheet ? `<a class="btn-secondary" href="${escapeHtml(datasheet)}" target="_blank" rel="noopener">Даташит</a>` : ''}
+            <a class="btn-primary" href="#contacts">Запит на партію</a>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  renderFeaturedBestsellers();
 
 </script>
 
