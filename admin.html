@@ -1531,8 +1531,12 @@ function buildProductCardHTML(id, p) {
   const priceHTML = p.cardPrice ? `<span class="product-price">${esc(p.cardPrice)}</span>` : '';
   const inStock = p.inStock !== false;
   const stockHTML = `<span class="stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наявності' : 'Немає в наявності'}</span>`;
-  // Antenna cards keep the R&S QC badge across admin publish cycles.
-  const qcHTML = id.startsWith('ant') ? `<span class="qc-badge">✓ Перевірено на R&amp;S ZNH18</span>` : '';
+  // Released antenna cards keep the R&S QC badge across admin publish cycles.
+  // In-development placeholders (title like «В процесі розробки...») are not tested yet — no badge.
+  const inDevelopment = /розробк/i.test(p.title || '');
+  const qcHTML = id.startsWith('ant') && !inDevelopment
+    ? `<span class="qc-badge">✓ Перевірено на R&amp;S ZNH18</span>`
+    : '';
   return `      <div class="product-card" onclick="openModal('${id}')"><div class="product-img">${imgPart}<span class="product-tag">${esc(p.tag)}</span></div><div class="product-info"><h3>${esc(p.title)}</h3><p>${esc(shortD)}</p>${stockHTML}${priceHTML}${qcHTML}</div></div>`;
 }
 
