@@ -714,6 +714,216 @@
       font-size: 0.95rem;
     }
 
+    /* ── RFQ / BATCH REQUEST FORM ── */
+    .rfq-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 28px 28px 24px;
+    }
+
+    .rfq-panel .section-label { margin-bottom: 8px; }
+
+    .rfq-panel h2 {
+      margin-bottom: 8px;
+    }
+
+    .rfq-panel > p {
+      color: var(--text2);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+    }
+
+    .rfq-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 16px;
+    }
+
+    .rfq-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rfq-field.full { grid-column: 1 / -1; }
+
+    .rfq-field label {
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .rfq-field label .req { color: var(--accent); margin-left: 2px; }
+
+    .rfq-field input,
+    .rfq-field select,
+    .rfq-field textarea {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-size: 0.9rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      box-sizing: border-box;
+      transition: border-color .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .rfq-field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a857a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .rfq-field input:focus,
+    .rfq-field select:focus,
+    .rfq-field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .rfq-field input.invalid,
+    .rfq-field select.invalid,
+    .rfq-field textarea.invalid {
+      border-color: var(--red);
+    }
+
+    .rfq-field textarea { min-height: 78px; resize: vertical; }
+
+    .rfq-hint {
+      font-size: 0.78rem;
+      color: var(--red);
+      min-height: 1em;
+      display: none;
+    }
+
+    .rfq-hint.visible { display: block; }
+
+    .rfq-check {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 4px 0 2px;
+    }
+
+    .rfq-check input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .rfq-check label {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 1.45;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: var(--font-body);
+      font-weight: 500;
+    }
+
+    .rfq-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .rfq-submit {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    .rfq-submit:hover { opacity: 0.88; }
+    .rfq-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .rfq-status {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .rfq-status.visible { display: block; }
+    .rfq-status.ok { color: var(--accent2); }
+    .rfq-status.err { color: var(--red); }
+
+    .rfq-success-panel {
+      display: none;
+      text-align: center;
+      padding: 28px 12px 12px;
+    }
+
+    .rfq-success-panel.visible { display: block; }
+
+    .rfq-success-panel svg {
+      width: 48px; height: 48px;
+      stroke: var(--accent); fill: none; stroke-width: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .rfq-success-panel h3 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .rfq-success-panel p {
+      color: var(--text2);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .rfq-success-panel button {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 18px;
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .rfq-success-panel button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      .rfq-panel { padding: 22px 18px; }
+      .rfq-form { grid-template-columns: 1fr; }
+    }
+
     /* ── FOOTER ── */
     footer {
       background: var(--text);
@@ -2016,20 +2226,93 @@
       </div>
     </div>
 
-    <div class="contact-note fade-in">
-      <h3>Як зробити замовлення</h3>
-      <ol>
-        <li>Оберіть потрібну продукцію в каталозі</li>
-        <li>Зв'яжіться з нами через Telegram</li>
-        <li>Отримайте консультацію та уточніть конфігурацію</li>
-        <li>Узгодьте умови та терміни постачання</li>
-        <li>Отримайте обладнання та технічну підтримку</li>
-      </ol>
-      <br>
-      <p style="color:var(--text3);font-size:0.88rem;line-height:1.7">
-        Ми не здійснюємо прямі продажі через сайт. Вся комунікація та узгодження
-        відбуваються в особистому чаті після вашого звернення.
+    <div class="rfq-panel fade-in" id="rfqPanel">
+      <div class="section-label">ЗАПИТ НА ПАРТІЮ // RFQ</div>
+      <h2>ПАРТІЯ ДЛЯ ВИРОБНИКІВ</h2>
+      <p>
+        Форма для комерційних виробників дронів і телеком-станцій.
+        Надішліть запит на партію — ми відповімо з наявністю, термінами та умовами постачання.
       </p>
+
+      <form class="rfq-form" id="rfqForm" novalidate>
+        <div class="rfq-field">
+          <label for="rfqCompany">Компанія <span class="req">*</span></label>
+          <input type="text" id="rfqCompany" name="company" autocomplete="organization" required />
+          <div class="rfq-hint" id="rfqCompanyHint">Вкажіть назву компанії</div>
+        </div>
+        <div class="rfq-field">
+          <label for="rfqEdrpou">ЄДРПОУ</label>
+          <input type="text" id="rfqEdrpou" name="edrpou" inputmode="numeric" autocomplete="off" />
+        </div>
+
+        <div class="rfq-field">
+          <label for="rfqContact">Контактна особа (Ім'я) <span class="req">*</span></label>
+          <input type="text" id="rfqContact" name="contact" autocomplete="name" required />
+          <div class="rfq-hint" id="rfqContactHint">Вкажіть ім'я контактної особи</div>
+        </div>
+        <div class="rfq-field">
+          <label for="rfqPhone">Телефон або Telegram <span class="req">*</span></label>
+          <input type="text" id="rfqPhone" name="phone" autocomplete="tel" required />
+          <div class="rfq-hint" id="rfqPhoneHint">Вкажіть телефон або Telegram</div>
+        </div>
+
+        <div class="rfq-field full">
+          <label for="rfqEmail">Email</label>
+          <input type="email" id="rfqEmail" name="email" autocomplete="email" />
+          <div class="rfq-hint" id="rfqEmailHint">Перевірте формат email</div>
+        </div>
+
+        <div class="rfq-field">
+          <label for="rfqModel">Модель <span class="req">*</span></label>
+          <select id="rfqModel" name="model" required>
+            <option value="">Оберіть модель</option>
+          </select>
+          <div class="rfq-hint" id="rfqModelHint">Оберіть модель із каталогу</div>
+        </div>
+        <div class="rfq-field">
+          <label for="rfqGain">Підсилення</label>
+          <select id="rfqGain" name="gain">
+            <option value="">Спочатку оберіть модель</option>
+          </select>
+        </div>
+
+        <div class="rfq-field">
+          <label for="rfqQty">Кількість, шт <span class="req">*</span></label>
+          <input type="number" id="rfqQty" name="qty" min="1" step="1" inputmode="numeric" required />
+          <div class="rfq-hint" id="rfqQtyHint">Вкажіть кількість (мінімум 1)</div>
+        </div>
+        <div class="rfq-field">
+          <label for="rfqDeadline">Бажаний термін</label>
+          <input type="text" id="rfqDeadline" name="deadline" placeholder="напр. до 15 квітня / 2–3 тижні" />
+        </div>
+
+        <div class="rfq-field full">
+          <label for="rfqRequirements">Вимоги (поляризація, роз'єм, кабель)</label>
+          <input type="text" id="rfqRequirements" name="requirements" placeholder="RHCP, SMA, кабель 30 см…" />
+        </div>
+
+        <div class="rfq-field full">
+          <label for="rfqComment">Коментар</label>
+          <textarea id="rfqComment" name="comment" placeholder="Додаткові деталі щодо партії або застосування"></textarea>
+        </div>
+
+        <div class="rfq-check">
+          <input type="checkbox" id="rfqSample" name="sample" />
+          <label for="rfqSample">Потрібен тестовий зразок з протоколом вимірювань</label>
+        </div>
+
+        <div class="rfq-actions">
+          <button type="submit" class="rfq-submit" id="rfqSubmit">Надіслати запит на партію →</button>
+          <div class="rfq-status" id="rfqStatus" role="status" aria-live="polite"></div>
+        </div>
+      </form>
+
+      <div class="rfq-success-panel" id="rfqSuccess">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h3>Запит надіслано</h3>
+        <p>Ми отримали ваш запит на партію і зв'яжемося з вами найближчим часом.</p>
+        <button type="button" onclick="resetRfqForm()">Надіслати ще один запит</button>
+      </div>
     </div>
   </div>
 </section>
@@ -2074,7 +2357,7 @@
       <div class="modal-specs" id="modalSpecs"></div>
     </div>
     <div class="modal-footer">
-      <a href="#contacts" class="btn-secondary" onclick="closeModalDirect()">Зв'язатися →</a>
+      <button type="button" class="btn-secondary" id="modalRfqBtn" onclick="startRfqFromModal()">Запит на партію</button>
       <button class="btn-add-cart" id="modalAddBtn" onclick="addToCartFromModal()">+ До замовлення</button>
     </div>
   </div>
@@ -2149,14 +2432,289 @@
 
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-  // ── CART SYSTEM ──
-  // Заказы теперь отправляются через Cloudflare Worker — токен бота там и в исходном коде сайта не хранится.
+  // ── CART + RFQ ──
+  // Заказы и RFQ отправляются через Cloudflare Worker — токен бота там и в исходном коде сайта не хранится.
   const WORKER_URL = 'https://sprut-orders.kostyaprochan.workers.dev';
+  const RFQ_OTHER_MODEL = '__other__';
 
   let cart = [];
   let currentModalId = null;
   let currentVariantIndex = 0;
   let currentPolarizationIndex = 0;
+
+  function isCatalogRealProduct(p) {
+    return !!(p && p.inStock !== false && !/розробк/i.test(p.title || ''));
+  }
+
+  function realProductEntries() {
+    return Object.entries(products).filter(([, p]) => isCatalogRealProduct(p));
+  }
+
+  function clearRfqFieldError(id) {
+    const el = document.getElementById(id);
+    const hint = document.getElementById(id + 'Hint');
+    if (el) el.classList.remove('invalid');
+    if (hint) hint.classList.remove('visible');
+  }
+
+  function setRfqFieldError(id, message) {
+    const el = document.getElementById(id);
+    const hint = document.getElementById(id + 'Hint');
+    if (el) el.classList.add('invalid');
+    if (hint) {
+      if (message) hint.textContent = message;
+      hint.classList.add('visible');
+    }
+  }
+
+  function populateRfqModels() {
+    const select = document.getElementById('rfqModel');
+    if (!select) return;
+    const current = select.value;
+    const options = ['<option value="">Оберіть модель</option>'];
+    realProductEntries().forEach(([id, p]) => {
+      options.push(`<option value="${escapeHtml(id)}">${escapeHtml(p.title)}</option>`);
+    });
+    options.push(`<option value="${RFQ_OTHER_MODEL}">Інше / нестандарт</option>`);
+    select.innerHTML = options.join('');
+    if (current && [...select.options].some(o => o.value === current)) select.value = current;
+  }
+
+  function updateRfqGains(preferredGain) {
+    const modelId = document.getElementById('rfqModel')?.value || '';
+    const gainSelect = document.getElementById('rfqGain');
+    if (!gainSelect) return;
+
+    if (!modelId) {
+      gainSelect.innerHTML = '<option value="">Спочатку оберіть модель</option>';
+      gainSelect.disabled = true;
+      return;
+    }
+
+    if (modelId === RFQ_OTHER_MODEL) {
+      gainSelect.innerHTML = '<option value="">Не застосовується / уточнити в коментарі</option>';
+      gainSelect.disabled = false;
+      return;
+    }
+
+    const p = products[modelId];
+    const variants = (p && p.variants) ? p.variants : [];
+    if (!variants.length) {
+      gainSelect.innerHTML = '<option value="">Без варіантів підсилення</option>';
+      gainSelect.disabled = false;
+      return;
+    }
+
+    gainSelect.disabled = false;
+    gainSelect.innerHTML = '<option value="">Оберіть підсилення</option>' +
+      variants.map(v => `<option value="${escapeHtml(v.label)}">${escapeHtml(v.label)}</option>`).join('');
+
+    if (preferredGain) {
+      const match = [...gainSelect.options].find(o => o.value === preferredGain);
+      if (match) gainSelect.value = preferredGain;
+    }
+  }
+
+  function startRfq(productId, gainLabel) {
+    closeModalDirect();
+    populateRfqModels();
+    const modelSelect = document.getElementById('rfqModel');
+    const form = document.getElementById('rfqForm');
+    const success = document.getElementById('rfqSuccess');
+    if (form) form.style.display = '';
+    if (success) success.classList.remove('visible');
+
+    if (modelSelect) {
+      if (productId && isCatalogRealProduct(products[productId])) {
+        modelSelect.value = productId;
+      } else if (productId === RFQ_OTHER_MODEL) {
+        modelSelect.value = RFQ_OTHER_MODEL;
+      }
+    }
+    updateRfqGains(gainLabel || '');
+    clearRfqFieldError('rfqCompany');
+    clearRfqFieldError('rfqContact');
+    clearRfqFieldError('rfqPhone');
+    clearRfqFieldError('rfqEmail');
+    clearRfqFieldError('rfqModel');
+    clearRfqFieldError('rfqQty');
+    const status = document.getElementById('rfqStatus');
+    if (status) {
+      status.className = 'rfq-status';
+      status.textContent = '';
+    }
+
+    const target = document.getElementById('rfqPanel') || document.getElementById('contacts');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      const focusEl = document.getElementById('rfqCompany') || document.getElementById('rfqQty');
+      if (focusEl) focusEl.focus({ preventScroll: true });
+    }, 450);
+  }
+
+  function startRfqFromModal() {
+    if (!currentModalId) {
+      startRfq();
+      return;
+    }
+    const p = products[currentModalId];
+    const gain = (p && p.variants && p.variants[currentVariantIndex]) ? p.variants[currentVariantIndex].label : '';
+    if (isCatalogRealProduct(p)) {
+      startRfq(currentModalId, gain);
+    } else {
+      startRfq(RFQ_OTHER_MODEL, '');
+    }
+  }
+
+  function resetRfqForm() {
+    const form = document.getElementById('rfqForm');
+    const success = document.getElementById('rfqSuccess');
+    if (success) success.classList.remove('visible');
+    if (form) {
+      form.style.display = '';
+      form.reset();
+    }
+    populateRfqModels();
+    updateRfqGains();
+    const status = document.getElementById('rfqStatus');
+    if (status) {
+      status.className = 'rfq-status';
+      status.textContent = '';
+    }
+    const btn = document.getElementById('rfqSubmit');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Надіслати запит на партію →';
+    }
+  }
+
+  function validateRfqForm() {
+    let ok = true;
+    const company = document.getElementById('rfqCompany').value.trim();
+    const contact = document.getElementById('rfqContact').value.trim();
+    const phone = document.getElementById('rfqPhone').value.trim();
+    const email = document.getElementById('rfqEmail').value.trim();
+    const model = document.getElementById('rfqModel').value;
+    const qtyRaw = document.getElementById('rfqQty').value.trim();
+    const qty = Number(qtyRaw);
+
+    clearRfqFieldError('rfqCompany');
+    clearRfqFieldError('rfqContact');
+    clearRfqFieldError('rfqPhone');
+    clearRfqFieldError('rfqEmail');
+    clearRfqFieldError('rfqModel');
+    clearRfqFieldError('rfqQty');
+
+    if (!company) { setRfqFieldError('rfqCompany', 'Вкажіть назву компанії'); ok = false; }
+    if (!contact) { setRfqFieldError('rfqContact', "Вкажіть ім'я контактної особи"); ok = false; }
+    if (!phone) { setRfqFieldError('rfqPhone', 'Вкажіть телефон або Telegram'); ok = false; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setRfqFieldError('rfqEmail', 'Перевірте формат email');
+      ok = false;
+    }
+    if (!model) { setRfqFieldError('rfqModel', 'Оберіть модель із каталогу'); ok = false; }
+    if (!qtyRaw || !Number.isFinite(qty) || qty < 1 || !Number.isInteger(qty)) {
+      setRfqFieldError('rfqQty', 'Вкажіть кількість (ціле число, мінімум 1)');
+      ok = false;
+    }
+    return ok;
+  }
+
+  function buildRfqMessage() {
+    const company = document.getElementById('rfqCompany').value.trim();
+    const edrpou = document.getElementById('rfqEdrpou').value.trim();
+    const contact = document.getElementById('rfqContact').value.trim();
+    const phone = document.getElementById('rfqPhone').value.trim();
+    const email = document.getElementById('rfqEmail').value.trim();
+    const modelId = document.getElementById('rfqModel').value;
+    const gain = document.getElementById('rfqGain').value.trim();
+    const qty = document.getElementById('rfqQty').value.trim();
+    const requirements = document.getElementById('rfqRequirements').value.trim();
+    const deadline = document.getElementById('rfqDeadline').value.trim();
+    const comment = document.getElementById('rfqComment').value.trim();
+    const sample = document.getElementById('rfqSample').checked;
+
+    let modelLabel = 'Інше / нестандарт';
+    if (modelId && modelId !== RFQ_OTHER_MODEL && products[modelId]) {
+      modelLabel = products[modelId].title;
+    }
+
+    const lines = [
+      '📦 *ЗАПИТ НА ПАРТІЮ (RFQ)*',
+      '',
+      `*Компанія:* ${company}`,
+      edrpou ? `*ЄДРПОУ:* ${edrpou}` : null,
+      `*Контактна особа:* ${contact}`,
+      `*Телефон/TG:* ${phone}`,
+      email ? `*Email:* ${email}` : null,
+      `*Модель:* ${modelLabel}`,
+      gain ? `*Підсилення:* ${gain}` : '*Підсилення:* —',
+      `*Кількість:* ${qty} шт`,
+      requirements ? `*Вимоги:* ${requirements}` : null,
+      deadline ? `*Бажаний термін:* ${deadline}` : null,
+      `*Тестовий зразок з протоколом:* ${sample ? 'Так' : 'Ні'}`,
+      comment ? `*Коментар:* ${comment}` : null
+    ].filter(line => line !== null && line !== undefined);
+
+    return lines.join('\n');
+  }
+
+  async function submitRfq(e) {
+    e.preventDefault();
+    const status = document.getElementById('rfqStatus');
+    if (status) {
+      status.className = 'rfq-status';
+      status.textContent = '';
+    }
+    if (!validateRfqForm()) {
+      if (status) {
+        status.className = 'rfq-status visible err';
+        status.textContent = 'Перевірте обовʼязкові поля форми.';
+      }
+      return;
+    }
+
+    const btn = document.getElementById('rfqSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Надсилаємо...';
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: buildRfqMessage() })
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error('Telegram error');
+
+      document.getElementById('rfqForm').style.display = 'none';
+      document.getElementById('rfqSuccess').classList.add('visible');
+      btn.disabled = false;
+      btn.textContent = 'Надіслати запит на партію →';
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Надіслати запит на партію →';
+      if (status) {
+        status.className = 'rfq-status visible err';
+        status.textContent = 'Не вдалося надіслати запит. Спробуйте ще раз або напишіть у Telegram.';
+      }
+    }
+  }
+
+  function initRfqForm() {
+    populateRfqModels();
+    updateRfqGains();
+    const form = document.getElementById('rfqForm');
+    const model = document.getElementById('rfqModel');
+    if (model) model.addEventListener('change', () => updateRfqGains());
+    if (form) form.addEventListener('submit', submitRfq);
+    ['rfqCompany', 'rfqContact', 'rfqPhone', 'rfqEmail', 'rfqModel', 'rfqQty'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', () => clearRfqFieldError(id));
+      el.addEventListener('change', () => clearRfqFieldError(id));
+    });
+  }
 
   function fmtPrice(n) {
     return n.toLocaleString('uk-UA') + ' ₴';
@@ -2537,7 +3095,7 @@
           <div class="featured-actions">
             <button type="button" class="btn-secondary" onclick="openModal('${item.id}', '${escapeHtml(variant.label)}')">Детальніше</button>
             ${datasheet ? `<a class="btn-secondary" href="${escapeHtml(datasheet)}" target="_blank" rel="noopener">Даташит</a>` : ''}
-            <a class="btn-primary" href="#contacts">Запит на партію</a>
+            <button type="button" class="btn-primary" onclick="startRfq('${item.id}', '${escapeHtml(variant.label)}')">Запит на партію</button>
           </div>
         </div>
       </article>`;
@@ -2545,6 +3103,7 @@
   }
 
   renderFeaturedBestsellers();
+  initRfqForm();
 
 </script>
 
@@ -2560,7 +3119,7 @@
     </div>
     <div class="order-form" id="orderForm">
       <h4>Ваші контакти</h4>
-      <div class="order-field"><input type="text" id="orderName" placeholder="Ім'я або позивний" /></div>
+      <div class="order-field"><input type="text" id="orderName" placeholder="Ім'я" /></div>
       <div class="order-field"><input type="text" id="orderPhone" placeholder="Телефон або Telegram" /></div>
       <div class="order-field"><textarea id="orderComment" placeholder="Коментар (необов'язково)"></textarea></div>
     </div>
