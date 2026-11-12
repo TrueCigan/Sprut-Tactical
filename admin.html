@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>SPRUT TACTICAL — Адмін Панель</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -1525,7 +1526,11 @@ function buildProductCardHTML(id, p) {
     oth: `<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>`
   };
   // Реальне фото товару (якщо було) має пріоритет над генеричною іконкою.
-  const imgPart = p.img ? `<img src="${esc(p.img)}" alt="${esc(p.title)}">` : iconMap[cat];
+  // Meaningful Ukrainian alt for SEO; admin publish must not wipe descriptive alts into empty/generic text.
+  const imgAlt = p.title
+    ? (/розробк/i.test(p.title) ? p.title : `${p.title} — продукція SPRUT TACTICAL`)
+    : 'Продукція SPRUT TACTICAL';
+  const imgPart = p.img ? `<img src="${esc(p.img)}" alt="${esc(imgAlt)}">` : iconMap[cat];
   // Короткий текст на картці (якщо був заданий окремо від повного опису) — інакше повний опис.
   const shortD = p.shortDesc || p.desc;
   const priceHTML = p.cardPrice ? `<span class="product-price">${esc(p.cardPrice)}</span>` : '';
@@ -1579,7 +1584,9 @@ async function publishToGitHub() {
   btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2v10M12 2L8 6M12 2l4 4"/></svg> Публікація...`;
 
   try {
-    // Rebuild products JS
+    // Rebuild products JS only. SEO <head> tags (title/description/canonical/OG/Twitter)
+    // and runtime JSON-LD helpers must remain untouched — Product schema is generated
+    // from `products` + catalog cards on the public site.
     let newHTML = workingHTML.replace(
       /const products\s*=\s*\{[\s\S]*?\};\s*\/\/ openModal/,
       buildProductsJS() + '\n\n  // openModal'
