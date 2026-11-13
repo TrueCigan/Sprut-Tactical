@@ -342,6 +342,17 @@
       height: 100%;
     }
 
+    /* Desktop: hide hero radar (site desktop breakpoint is >900px) */
+    @media (min-width: 901px) {
+      .hero-visual {
+        display: none;
+      }
+      .radar-sweep,
+      .radar-pulse {
+        animation: none !important;
+      }
+    }
+
     /* ── SECTIONS COMMON ── */
     section {
       padding: 100px 5%;
