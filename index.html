@@ -504,6 +504,45 @@
       padding: 4px 10px;
       border-radius: 2px;
     }
+
+    /* Favorite / «хіт» marker — used on featuredBestsellers + matching catalog cards */
+    .favorite-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-heading);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      padding: 3px 8px 3px 6px;
+      border-radius: 2px;
+      line-height: 1.25;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .favorite-star {
+      color: var(--accent);
+      font-size: 0.9rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .favorite-label {
+      white-space: nowrap;
+    }
+
+    .product-img .favorite-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1;
+      left: auto;
+    }
     .stock-badge {
       display: inline-flex;
       align-items: center;
@@ -1058,6 +1097,19 @@
       .product-info h3 { font-size: 0.78rem; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .product-info p { font-size: 0.75rem; }
       .product-tag { font-size: 0.55rem; padding: 3px 8px; }
+      .product-img .favorite-badge {
+        top: 8px;
+        right: 8px;
+        padding: 3px 6px 3px 5px;
+        font-size: 0.48rem;
+        letter-spacing: 0.4px;
+        max-width: calc(100% - 16px);
+      }
+      .product-img .favorite-label {
+        white-space: normal;
+        line-height: 1.15;
+      }
+      .favorite-star { font-size: 0.78rem; }
       .cat-tabs { width: 100%; }
       .cat-tab { flex: 1; padding: 8px 6px; font-size: 0.68rem; letter-spacing: 0.5px; text-align: center; }
     }
@@ -1343,6 +1395,11 @@
       gap: 8px;
     }
 
+    .featured-body .favorite-badge {
+      align-self: flex-start;
+      margin-bottom: -2px;
+    }
+
     .featured-body h3 {
       font-family: var(--font-heading);
       font-size: 0.98rem;
@@ -1439,6 +1496,11 @@
       .featured-img { min-height: 130px; }
       .featured-body { padding: 10px; gap: 6px; }
       .featured-body h3 { font-size: 0.88rem; }
+      .featured-body .favorite-badge {
+        font-size: 0.48rem;
+        padding: 3px 6px 3px 5px;
+        letter-spacing: 0.4px;
+      }
       .featured-specs { grid-template-columns: 1fr 1fr; gap: 4px; }
       .featured-spec { padding: 4px 6px; }
       .featured-spec span { font-size: 0.72rem; }
@@ -2420,6 +2482,72 @@
     { id: 'ant2', variant: '16 dBi', badge: 'Основна модель' }
   ];
 
+  const FAVORITE_BADGE_LABEL = 'Обирають клієнти';
+
+  function favoriteBadgeHTML() {
+    return `<span class="favorite-badge" title="${FAVORITE_BADGE_LABEL}"><span class="favorite-star" aria-hidden="true">★</span><span class="favorite-label">${FAVORITE_BADGE_LABEL}</span></span>`;
+  }
+
+  function featuredProductIds() {
+    return new Set((featuredBestsellers || []).map(item => item.id));
+  }
+
+  // Lower GHz bound for catalog sort. Prefer title band («6–7 ГГц») over detailed VSWR specs.
+  function parseFreqLowerGHz(product) {
+    if (!product) return Number.POSITIVE_INFINITY;
+    const sources = [product.title || ''];
+    (product.specs || []).forEach(s => {
+      if (/діапазон|частот/i.test(s.label || '')) sources.push(s.value || '');
+    });
+    for (const text of sources) {
+      const range = String(text).match(/(\d+(?:[.,]\d+)?)\s*[–\-—]\s*\d+(?:[.,]\d+)?\s*(?:ГГц|GHz)/i);
+      if (range) return parseFloat(range[1].replace(',', '.'));
+      const single = String(text).match(/(\d+(?:[.,]\d+)?)\s*(?:ГГц|GHz)/i);
+      if (single) return parseFloat(single[1].replace(',', '.'));
+    }
+    return Number.POSITIVE_INFINITY;
+  }
+
+  function isAntennaDevPlaceholder(product) {
+    return !!(product && /розробк/i.test(product.title || ''));
+  }
+
+  function productIdFromCard(card) {
+    const m = (card.getAttribute('onclick') || '').match(/openModal\('([^']+)'\)/);
+    return m ? m[1] : null;
+  }
+
+  // Reorder #cat-ant cards by frequency ascending; keep «в розробці» placeholders last.
+  // Stable within equal ranges. Does not rewrite product data (admin.html parsing stays intact).
+  function sortAntennaCatalogByFrequency() {
+    const grid = document.querySelector('#cat-ant .catalog-grid');
+    if (!grid) return;
+    const items = Array.from(grid.querySelectorAll('.product-card')).map((el, index) => ({ el, index }));
+    items.sort((a, b) => {
+      const pa = products[productIdFromCard(a.el)];
+      const pb = products[productIdFromCard(b.el)];
+      const placeA = isAntennaDevPlaceholder(pa) ? 1 : 0;
+      const placeB = isAntennaDevPlaceholder(pb) ? 1 : 0;
+      if (placeA !== placeB) return placeA - placeB;
+      const freqA = parseFreqLowerGHz(pa);
+      const freqB = parseFreqLowerGHz(pb);
+      if (freqA !== freqB) return freqA - freqB;
+      return a.index - b.index;
+    });
+    items.forEach(({ el }) => grid.appendChild(el));
+  }
+
+  function markFeaturedCatalogCards() {
+    const ids = featuredProductIds();
+    document.querySelectorAll('#cat-ant .product-card').forEach(card => {
+      const id = productIdFromCard(card);
+      if (!id || !ids.has(id)) return;
+      const img = card.querySelector('.product-img');
+      if (!img || img.querySelector('.favorite-badge')) return;
+      img.insertAdjacentHTML('beforeend', favoriteBadgeHTML());
+    });
+  }
+
   function closeModal(e) {
     if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
   }
@@ -3200,6 +3328,7 @@
           ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(name)}" loading="lazy">` : ''}
         </div>
         <div class="featured-body">
+          ${favoriteBadgeHTML()}
           <h3>${escapeHtml(name)}</h3>
           <div class="featured-specs">
             ${specs.map(s => `<div class="featured-spec"><strong>${escapeHtml(s.label)}</strong><span>${escapeHtml(s.value)}</span></div>`).join('')}
@@ -3218,6 +3347,8 @@
     }).join('');
   }
 
+  sortAntennaCatalogByFrequency();
+  markFeaturedCatalogCards();
   renderFeaturedBestsellers();
   injectSeoJsonLd();
   initRfqForm();
