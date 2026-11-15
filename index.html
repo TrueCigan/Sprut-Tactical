@@ -3203,7 +3203,10 @@
 
   // SEO: Product/Organization JSON-LD from live catalog data so admin edits stay in sync
   // without rewriting static <script type="application/ld+json"> blocks on publish.
+  // Emit Product nodes only when a valid numeric price exists (Google requires offers,
+  // review, or aggregateRating). Do not fabricate review/aggregateRating.
   const SITE_ORIGIN = 'https://spruttactical.com.ua';
+  const CATALOG_URL = SITE_ORIGIN + '/#catalog';
 
   function absoluteSiteUrl(path) {
     if (!path) return '';
@@ -3212,11 +3215,47 @@
     return SITE_ORIGIN + '/' + clean.split('/').map(encodeURIComponent).join('/');
   }
 
+  function isValidNumericPrice(price) {
+    if (price === undefined || price === null || price === '') return false;
+    const n = Number(price);
+    return Number.isFinite(n) && n > 0;
+  }
+
   function variantPrices(product) {
     return (product.variants || [])
       .map(v => v && v.price)
-      .filter(price => price !== undefined && price !== null && price !== '' && !Number.isNaN(Number(price)))
+      .filter(isValidNumericPrice)
       .map(Number);
+  }
+
+  // End of next calendar year — keeps priceValidUntil fresh without inventing a policy.
+  function priceValidUntilDate() {
+    return (new Date().getFullYear() + 1) + '-12-31';
+  }
+
+  // sku/mpn only when an explicit model code exists on the product (not derived/guessed).
+  function productModelCode(product) {
+    const code = product && (product.sku || product.mpn || product.model);
+    if (!code) return null;
+    const s = String(code).trim();
+    return s || null;
+  }
+
+  function offerCommonFields(product) {
+    const availability = product.inStock === false
+      ? 'https://schema.org/OutOfStock'
+      : 'https://schema.org/InStock';
+    return {
+      priceCurrency: 'UAH',
+      availability,
+      url: CATALOG_URL,
+      itemCondition: 'https://schema.org/NewCondition',
+      priceValidUntil: priceValidUntilDate(),
+      seller: {
+        '@type': 'Organization',
+        name: 'SPRUT TACTICAL'
+      }
+    };
   }
 
   function buildProductOffers(product) {
@@ -3224,27 +3263,61 @@
     if (!prices.length) return null;
     const low = Math.min(...prices);
     const high = Math.max(...prices);
-    const availability = product.inStock === false
-      ? 'https://schema.org/OutOfStock'
-      : 'https://schema.org/InStock';
+    const common = offerCommonFields(product);
     if (low === high) {
       return {
         '@type': 'Offer',
-        priceCurrency: 'UAH',
-        price: String(low),
-        availability,
-        url: SITE_ORIGIN + '/'
+        ...common,
+        price: String(low)
       };
     }
     return {
       '@type': 'AggregateOffer',
-      priceCurrency: 'UAH',
+      ...common,
       lowPrice: String(low),
       highPrice: String(high),
-      offerCount: String(prices.length),
-      availability,
-      url: SITE_ORIGIN + '/'
+      offerCount: String(prices.length)
     };
+  }
+
+  function buildProductJsonLdEntry(id, product, imageSrc) {
+    const offers = buildProductOffers(product);
+    if (!offers) return null;
+    const entry = {
+      '@type': 'Product',
+      name: product.title,
+      description: product.desc,
+      brand: { '@type': 'Brand', name: 'SPRUT TACTICAL' },
+      offers
+    };
+    if (imageSrc) entry.image = absoluteSiteUrl(imageSrc);
+    const modelCode = productModelCode(product);
+    if (modelCode) {
+      entry.sku = modelCode;
+      entry.mpn = modelCode;
+    }
+    return entry;
+  }
+
+  function buildSeoJsonLdGraph(sameAs, imageById) {
+    const graph = [{
+      '@type': 'Organization',
+      name: 'SPRUT TACTICAL',
+      url: SITE_ORIGIN + '/',
+      logo: SITE_ORIGIN + '/logo.png',
+      description: 'Виробництво рупорних антен 5–6 ГГц і 6–7 ГГц в Україні. Партії для виробників дронів і телеком-станцій.',
+      ...(sameAs && sameAs.length ? { sameAs } : {})
+    }];
+
+    Object.entries(products).forEach(([id, product]) => {
+      if (!product) return;
+      // Skip unpriced products (e.g. 4–5 GHz with no variant prices) and placeholders.
+      // Dev placeholders also lack prices; excluding by price alone is the Google-safe rule.
+      const entry = buildProductJsonLdEntry(id, product, imageById && imageById[id]);
+      if (entry) graph.push(entry);
+    });
+
+    return graph;
   }
 
   function injectSeoJsonLd() {
@@ -3257,27 +3330,10 @@
       if (href && !sameAs.includes(href)) sameAs.push(href);
     });
 
-    const graph = [{
-      '@type': 'Organization',
-      name: 'SPRUT TACTICAL',
-      url: SITE_ORIGIN + '/',
-      logo: SITE_ORIGIN + '/logo.png',
-      description: 'Виробництво рупорних антен 5–6 ГГц і 6–7 ГГц в Україні. Партії для виробників дронів і телеком-станцій.',
-      ...(sameAs.length ? { sameAs } : {})
-    }];
-
-    realProductEntries().forEach(([id, product]) => {
-      const imageSrc = getCatalogCardImage(id);
-      const entry = {
-        '@type': 'Product',
-        name: product.title,
-        description: product.desc,
-        brand: { '@type': 'Brand', name: 'SPRUT TACTICAL' }
-      };
-      if (imageSrc) entry.image = absoluteSiteUrl(imageSrc);
-      const offers = buildProductOffers(product);
-      if (offers) entry.offers = offers;
-      graph.push(entry);
+    const imageById = {};
+    Object.keys(products).forEach(id => {
+      const src = getCatalogCardImage(id);
+      if (src) imageById[id] = src;
     });
 
     const script = document.createElement('script');
@@ -3285,7 +3341,7 @@
     script.id = 'seo-jsonld';
     script.textContent = JSON.stringify({
       '@context': 'https://schema.org',
-      '@graph': graph
+      '@graph': buildSeoJsonLdGraph(sameAs, imageById)
     });
     document.head.appendChild(script);
   }
