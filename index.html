@@ -2590,8 +2590,21 @@
 
   // ── CART + RFQ ──
   // Заказы и RFQ отправляются через Cloudflare Worker — токен бота там и в исходном коде сайта не хранится.
+  // Both flows MUST use postTelegramText() so the payload shape stays identical: { text }.
+  // Dual-recipient fan-out (Kostya + father) is the worker's job — see cloudflare-worker/sprut-orders/.
   const WORKER_URL = 'https://sprut-orders.kostyaprochan.workers.dev';
   const RFQ_OTHER_MODEL = '__other__';
+
+  async function postTelegramText(text) {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error('Telegram error');
+    return data;
+  }
 
   let cart = [];
   let currentModalId = null;
@@ -2835,13 +2848,7 @@
     btn.textContent = 'Надсилаємо...';
 
     try {
-      const res = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: buildRfqMessage() })
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error('Telegram error');
+      await postTelegramText(buildRfqMessage());
 
       document.getElementById('rfqForm').style.display = 'none';
       document.getElementById('rfqSuccess').classList.add('visible');
@@ -3159,27 +3166,18 @@
     const text = `🛒 *НОВЕ ЗАМОВЛЕННЯ*\n\n*Товари:*\n${itemsList}${total > 0 ? `\n\n*Разом:* ${fmtPrice(total)}` : ''}\n\n*Контакт:* ${name}\n*Телефон/TG:* ${phone}${comment ? '\n*Коментар:* ' + comment : ''}`;
 
     try {
-      const res = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        cart = [];
-        updateCartCount();
-        document.getElementById('cartItems').innerHTML = '';
-        document.getElementById('orderForm').style.display = 'none';
-        document.getElementById('cartFooter').style.display = 'none';
-        document.getElementById('cartItems').innerHTML = `
+      await postTelegramText(text);
+      cart = [];
+      updateCartCount();
+      document.getElementById('cartItems').innerHTML = '';
+      document.getElementById('orderForm').style.display = 'none';
+      document.getElementById('cartFooter').style.display = 'none';
+      document.getElementById('cartItems').innerHTML = `
           <div class="order-success">
             <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <h4>Замовлення прийнято!</h4>
             <p>Ми зв'яжемося з вами найближчим часом.</p>
           </div>`;
-      } else {
-        throw new Error('Telegram error');
-      }
     } catch(e) {
       btn.disabled = false;
       btn.textContent = 'Помилка. Спробуйте ще раз';

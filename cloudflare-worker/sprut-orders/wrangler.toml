@@ -1,0 +1,7 @@
+name = "sprut-orders"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+
+# Secrets (set via `wrangler secret put`, do not commit values):
+#   BOT_TOKEN  — Telegram bot token
+#   CHAT_IDS   — "845123554,1362338508"  (Kostya + father; from pre-worker site history)
