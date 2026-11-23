@@ -1310,6 +1310,144 @@
       line-height: 1.2;
     }
 
+    /* VSWR / КСХН measurement teaser (catalog card + product modal) */
+    .vswr-teaser {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--surface2);
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      font: inherit;
+    }
+    .vswr-teaser:hover,
+    .vswr-teaser:focus-visible {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      outline: none;
+    }
+    .vswr-teaser-thumb {
+      flex-shrink: 0;
+      width: 72px;
+      height: 43px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 2px;
+      background: #111;
+    }
+    .vswr-teaser-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .vswr-teaser-text strong {
+      font-family: var(--font-heading);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      line-height: 1.2;
+    }
+    .vswr-teaser-text span {
+      font-size: 0.72rem;
+      color: var(--text2);
+      line-height: 1.35;
+    }
+    .modal-vswr {
+      margin: 0 0 18px;
+    }
+    .modal-vswr .vswr-teaser {
+      margin-top: 0;
+      padding: 10px 12px;
+    }
+    .modal-vswr .vswr-teaser-thumb {
+      width: 96px;
+      height: 58px;
+    }
+    .modal-vswr .vswr-teaser-text strong {
+      font-size: 0.72rem;
+    }
+    .modal-vswr .vswr-teaser-text span {
+      font-size: 0.8rem;
+    }
+
+    /* Full-screen VSWR lightbox */
+    .vswr-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background: rgba(10, 14, 10, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overscroll-behavior: contain;
+    }
+    .vswr-lightbox.open { display: flex; }
+    .vswr-lightbox-inner {
+      position: relative;
+      max-width: min(960px, 100%);
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .vswr-lightbox-inner img {
+      display: block;
+      width: 100%;
+      max-height: calc(100vh - 120px);
+      object-fit: contain;
+      background: #0a0a0a;
+      border-radius: 4px;
+    }
+    .vswr-lightbox-caption {
+      font-size: 0.85rem;
+      color: #e8ece6;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .vswr-lightbox-caption strong {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .vswr-lightbox-close {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .vswr-lightbox-close:hover { background: var(--accent-light); }
+    @media (max-width: 640px) {
+      .vswr-teaser-thumb { width: 56px; height: 34px; }
+      .vswr-lightbox { padding: 16px 10px; }
+      .vswr-lightbox-close { top: -4px; right: 0; }
+      .vswr-lightbox-caption { font-size: 0.78rem; }
+    }
+
     /* ── FEATURED BESTSELLERS ── */
     #featured {
       grid-area: featured;
@@ -2444,11 +2582,24 @@
       </div>
       <div class="modal-price" id="modalPrice" style="display:none"></div>
       <div id="modalDatasheet" style="display:none;margin:14px 0"></div>
+      <div class="modal-vswr" id="modalVswr" style="display:none"></div>
       <div class="modal-specs" id="modalSpecs"></div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn-secondary" id="modalRfqBtn" onclick="startRfqFromModal()">Запит на партію</button>
       <button class="btn-add-cart" id="modalAddBtn" onclick="addToCartFromModal()">+ До замовлення</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── VSWR LIGHTBOX ── -->
+<div class="vswr-lightbox" id="vswrLightbox" role="dialog" aria-modal="true" aria-labelledby="vswrLightboxTitle" onclick="closeVswrLightboxOutside(event)">
+  <div class="vswr-lightbox-inner">
+    <button type="button" class="vswr-lightbox-close" onclick="closeVswrLightbox()" aria-label="Закрити">✕</button>
+    <img id="vswrLightboxImg" src="" alt="" width="800" height="480">
+    <div class="vswr-lightbox-caption">
+      <strong id="vswrLightboxTitle">Графік КСХН (вимір Rohde &amp; Schwarz)</strong>
+      <span id="vswrLightboxCaption"></span>
     </div>
   </div>
 </div>
@@ -2464,12 +2615,12 @@
 
   // Product data
   const products = {
-    'ant1': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 6–7 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон (КСХ < 2)', value: '5.6–7.3 ГГц' }, { label: 'Діапазон (КСХ < 1.5)', value: '5.7–7.0 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Промінь ДС', value: '33°' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'ККД', value: '90%' }, { label: 'Габарити', value: '135×82×82 мм' }, { label: 'Вага', value: '130 г' }, { label: 'Температура', value: '-40…+85 °C' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 6100 }, { label: '16 dBi' }, { label: '18 dBi', price: 6500, polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 800 }] }, { label: '21 dBi', price: 7400 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_6-7-14.pdf', '', 'datasheets/ST_6-7-18.pdf', 'datasheets/ST_6-7-21.pdf'] },
-    'ant2': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 5–6 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон (КСХ < 2)', value: '4.7–6.4 ГГц' }, { label: 'Діапазон (КСХ < 1.5)', value: '4.8–6.3 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Промінь ДС', value: '33°' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'ККД', value: '90%' }, { label: 'Габарити', value: '135×82×82 мм' }, { label: 'Вага', value: '180 г' }, { label: 'Температура', value: '-40…+85 °C' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 6500 }, { label: '16 dBi', price: 6800 }, { label: '18 dBi', price: 7100 }, { label: '21 dBi', price: 7700 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_5-6-14.pdf', '', 'datasheets/ST_5-6-18.pdf', 'datasheets/ST_5-6-21.pdf'] },
-    'ant11': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 7–8 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон', value: '7–8 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 5500 }, { label: '16 dBi' }, { label: '18 dBi', price: 5900 }, { label: '21 dBi', price: 6700 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_7-8-14.pdf', '', 'datasheets/ST_7-8-18.pdf', 'datasheets/ST_7-8-21.pdf'] },
+    'ant1': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 6–7 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон (КСХ < 2)', value: '5.6–7.3 ГГц' }, { label: 'Діапазон (КСХ < 1.5)', value: '5.7–7.0 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Промінь ДС', value: '33°' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'ККД', value: '90%' }, { label: 'Габарити', value: '135×82×82 мм' }, { label: 'Вага', value: '130 г' }, { label: 'Температура', value: '-40…+85 °C' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 6100 }, { label: '16 dBi' }, { label: '18 dBi', price: 6500, polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 800 }] }, { label: '21 dBi', price: 7400 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_6-7-14.pdf', '', 'datasheets/ST_6-7-18.pdf', 'datasheets/ST_6-7-21.pdf'], vswr: { img: 'img/quality/vswr_6-7ghz.jpg', range: '5.735–7.475 ГГц', min: '1.07', at: '6.5 ГГц' } },
+    'ant2': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 5–6 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон (КСХ < 2)', value: '4.7–6.4 ГГц' }, { label: 'Діапазон (КСХ < 1.5)', value: '4.8–6.3 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Промінь ДС', value: '33°' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'ККД', value: '90%' }, { label: 'Габарити', value: '135×82×82 мм' }, { label: 'Вага', value: '180 г' }, { label: 'Температура', value: '-40…+85 °C' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 6500 }, { label: '16 dBi', price: 6800 }, { label: '18 dBi', price: 7100 }, { label: '21 dBi', price: 7700 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_5-6-14.pdf', '', 'datasheets/ST_5-6-18.pdf', 'datasheets/ST_5-6-21.pdf'], vswr: { img: 'img/quality/vswr_5-6ghz.jpg', range: '4.780–6.295 ГГц', min: '1.17', at: '5.5 ГГц' } },
+    'ant11': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 7–8 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Матеріал — алюміній. Доступна у чотирьох варіаціях підсилення: 14, 16, 18 та 21 dBi, а також у різних варіаціях поляризації.', specs: [{ label: 'Діапазон', value: '7–8 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }, { label: 'Потужність', value: '50 Вт' }, { label: 'Вхідний опір', value: '50 Ом' }, { label: 'Матеріал', value: 'Алюміній' }], inStock: true, variants: [{ label: '14 dBi', price: 5500 }, { label: '16 dBi' }, { label: '18 dBi', price: 5900 }, { label: '21 dBi', price: 6700 }], polarizations: [{ label: 'RHCP', surcharge: 0 }, { label: 'LHCP', surcharge: 0 }, { label: 'RHCP+LHCP', surcharge: 500 }], datasheets: ['datasheets/ST_7-8-14.pdf', '', 'datasheets/ST_7-8-18.pdf', 'datasheets/ST_7-8-21.pdf'], vswr: { img: 'img/quality/vswr_7-8ghz.jpg', range: '6.788–8.643 ГГц', min: '1.06', at: '7.505 ГГц' } },
     'ant12': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 3–4 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Технічний паспорт та детальні характеристики буде додано пізніше.', specs: [{ label: 'Діапазон', value: '3–4 ГГц' }, { label: 'Підсилення', value: '15 / 16 dBi' }], inStock: true, variants: [{ label: '15 dBi', price: 7500 }, { label: '16 dBi' }] },
-    'ant13': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 8–9 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Технічний паспорт та детальні характеристики буде додано пізніше.', specs: [{ label: 'Діапазон', value: '8–9 ГГц' }, { label: 'Підсилення', value: '16 / 18 dBi' }], inStock: true, variants: [{ label: '16 dBi' }, { label: '18 dBi', price: 5800 }] },
-    'ant14': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 4–5 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Технічний паспорт та детальні характеристики буде додано пізніше.', specs: [{ label: 'Діапазон', value: '4–5 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }], inStock: true, variants: [{ label: '14 dBi' }, { label: '16 dBi' }, { label: '18 dBi' }, { label: '21 dBi' }] },
+    'ant13': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 8–9 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Технічний паспорт та детальні характеристики буде додано пізніше.', specs: [{ label: 'Діапазон', value: '8–9 ГГц' }, { label: 'Підсилення', value: '16 / 18 dBi' }], inStock: true, variants: [{ label: '16 dBi' }, { label: '18 dBi', price: 5800 }], vswr: { img: 'img/quality/vswr_8-9ghz.jpg', range: '7.640–9.580 ГГц', min: '1.22', at: '8.505 ГГц' } },
+    'ant14': { tag: 'Антени', title: 'РУПОРНА АНТЕНА 4–5 ГГц', desc: 'Рупорна антена з металевого хвилеводу у формі рупора, призначена для фокусування та направлення радіохвиль у вузький промінь. Технічний паспорт та детальні характеристики буде додано пізніше.', specs: [{ label: 'Діапазон', value: '4–5 ГГц' }, { label: 'Підсилення', value: '14 / 16 / 18 / 21 dBi' }], inStock: true, variants: [{ label: '14 dBi' }, { label: '16 dBi' }, { label: '18 dBi' }, { label: '21 dBi' }], vswr: { img: 'img/quality/vswr_3.5-4.5ghz.jpg', range: '3.540–4.590 ГГц', min: '1.04', at: '4.0 ГГц' } },
     'ant3': { tag: 'Антени', title: 'В процесі розробки...', desc: 'Опис буде додано пізніше.', specs: [{ label: 'Тип', value: 'всеспрямована' }, { label: 'Діапазон', value: '100–1000 МГц' }, { label: 'Підсилення', value: '5 dBi' }, { label: 'Вага', value: '280 г' }], inStock: false },
     'ant4': { tag: 'Антени', title: 'В процесі розробки...', desc: 'Опис буде додано пізніше.', specs: [{ label: 'Діапазон', value: 'GPS L1/L2, ГЛОНАСС' }, { label: 'Підсилення', value: '28 dB LNA' }, { label: 'Вага', value: '85 г' }], inStock: false }
   };
@@ -2487,6 +2638,65 @@
 
   function favoriteBadgeHTML() {
     return `<span class="favorite-badge" title="${FAVORITE_BADGE_LABEL}"><span class="favorite-star" aria-hidden="true">★</span><span class="favorite-label">${FAVORITE_BADGE_LABEL}</span></span>`;
+  }
+
+  function vswrCaption(v) {
+    if (!v) return '';
+    return `Робочий діапазон з КСХН ≤ 2: ${v.range} · мін. КСХН ${v.min} @ ${v.at}`;
+  }
+
+  function vswrTeaserHTML(id, v, opts) {
+    if (!v || !v.img) return '';
+    const compact = !!(opts && opts.compact);
+    const caption = vswrCaption(v);
+    const thumbW = compact ? 72 : 96;
+    const thumbH = compact ? 43 : 58;
+    return `<button type="button" class="vswr-teaser" onclick="event.stopPropagation(); openVswrLightbox('${id}')" aria-label="Графік КСХН (вимір Rohde &amp; Schwarz)">
+      <img class="vswr-teaser-thumb" src="${v.img}" alt="Скріншот вимірювання КСХН на Rohde &amp; Schwarz" loading="lazy" width="${thumbW}" height="${thumbH}">
+      <span class="vswr-teaser-text">
+        <strong>Графік КСХН (вимір Rohde &amp; Schwarz)</strong>
+        <span>${caption}</span>
+      </span>
+    </button>`;
+  }
+
+  function openVswrLightbox(id) {
+    const p = products[id];
+    if (!p || !p.vswr || !p.vswr.img) return;
+    const lb = document.getElementById('vswrLightbox');
+    const img = document.getElementById('vswrLightboxImg');
+    img.src = p.vswr.img;
+    img.alt = `Графік КСХН ${p.title} — вимір Rohde & Schwarz`;
+    document.getElementById('vswrLightboxCaption').textContent = vswrCaption(p.vswr);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeVswrLightbox() {
+    const lb = document.getElementById('vswrLightbox');
+    if (!lb.classList.contains('open')) return;
+    lb.classList.remove('open');
+    document.getElementById('vswrLightboxImg').removeAttribute('src');
+    // Restore scroll lock only if product modal is still open
+    if (!document.getElementById('modalOverlay').classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  function closeVswrLightboxOutside(e) {
+    if (e.target === document.getElementById('vswrLightbox')) closeVswrLightbox();
+  }
+
+  // Inject VSWR teasers into catalog cards that have measurement data (runtime — admin republish safe).
+  function injectVswrCatalogTeasers() {
+    document.querySelectorAll('#cat-ant .product-card').forEach(card => {
+      const id = productIdFromCard(card);
+      const p = id && products[id];
+      if (!p || !p.vswr) return;
+      const info = card.querySelector('.product-info');
+      if (!info || info.querySelector('.vswr-teaser')) return;
+      info.insertAdjacentHTML('beforeend', vswrTeaserHTML(id, p.vswr, { compact: true }));
+    });
   }
 
   function featuredProductIds() {
@@ -2558,7 +2768,14 @@
     document.body.style.overflow = '';
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('vswrLightbox').classList.contains('open')) {
+      closeVswrLightbox();
+      return;
+    }
+    closeModalDirect();
+  });
 
   // Mobile menu
   function toggleMenu() {
@@ -2897,6 +3114,14 @@
     const inStock = p.inStock !== false;
     stockEl.textContent = inStock ? 'В наявності' : 'Немає в наявності';
     stockEl.className = 'stock-badge ' + (inStock ? 'in-stock' : 'out-of-stock');
+    const vswrEl = document.getElementById('modalVswr');
+    if (p.vswr && p.vswr.img) {
+      vswrEl.style.display = '';
+      vswrEl.innerHTML = vswrTeaserHTML(id, p.vswr, { compact: false });
+    } else {
+      vswrEl.style.display = 'none';
+      vswrEl.innerHTML = '';
+    }
     const specsEl = document.getElementById('modalSpecs');
     specsEl.innerHTML = p.specs.map(s =>
       `<div class="modal-spec"><strong>${s.label}</strong><span>${s.value}</span></div>`
@@ -3406,6 +3631,7 @@
 
   sortAntennaCatalogByFrequency();
   markFeaturedCatalogCards();
+  injectVswrCatalogTeasers();
   renderFeaturedBestsellers();
   injectSeoJsonLd();
   initRfqForm();

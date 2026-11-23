@@ -1240,12 +1240,15 @@ function parseProducts() {
     const specsM = [...body.matchAll(/\{\s*label:\s*'([^']*)',\s*value:\s*'([^']*)'\s*\}/g)];
     const inStockM = body.match(/inStock:\s*(true|false)/);
     const inStock = inStockM ? inStockM[1] === 'true' : true;
-    // Деякі товари мають додаткові поля (variants/polarizations для цін і опцій),
+    // Деякі товари мають додаткові поля (variants/polarizations/datasheets/vswr),
     // які ця адмінка не редагує напряму — зберігаємо їх "як є", щоб не втратити при збереженні.
     let extraRaw = '';
     const vIdx = body.indexOf('variants:');
     const pIdx = body.indexOf('polarizations:');
-    const extraStart = vIdx !== -1 ? vIdx : pIdx;
+    const dIdx = body.indexOf('datasheets:');
+    const vswrIdx = body.indexOf('vswr:');
+    const extraCandidates = [vIdx, pIdx, dIdx, vswrIdx].filter(i => i !== -1);
+    const extraStart = extraCandidates.length ? Math.min(...extraCandidates) : -1;
     if (extraStart !== -1) {
       extraRaw = body.slice(extraStart).trim().replace(/,\s*$/, '');
       // inStock додається як окреме поле форми — прибираємо його з "сирого" хвоста, щоб не задвоїти.
@@ -1268,8 +1271,9 @@ function parseProducts() {
 // Якщо їх не зберегти тут, наступна публікація перезапише картки generic-шаблоном
 // і зітре реальні фото/ціни/короткі описи.
 function parseCatalogCards() {
-  // Optional trailing .qc-badge (antenna cards) must be allowed so admin can still parse img/shortDesc/price.
-  const cardRegex = /<div class="product-card" onclick="openModal\('([^']+)'\)"><div class="product-img">(?:<img src="([^"]*)"[^>]*>|<svg[\s\S]*?<\/svg>)<span class="product-tag">[^<]*<\/span><\/div><div class="product-info"><h3>[^<]*<\/h3><p>([^<]*)<\/p>(?:<span class="stock-badge[^"]*">[^<]*<\/span>)?(?:<span class="product-price">([^<]*)<\/span>)?(?:<span class="qc-badge">[^<]*<\/span>)?<\/div><\/div>/g;
+  // Optional trailing .qc-badge / .vswr-teaser (antenna cards) must be allowed so admin can still parse img/shortDesc/price.
+  // VSWR teasers are normally injected at runtime; tolerate them if present in saved markup.
+  const cardRegex = /<div class="product-card" onclick="openModal\('([^']+)'\)"><div class="product-img">(?:<img src="([^"]*)"[^>]*>|<svg[\s\S]*?<\/svg>)<span class="product-tag">[^<]*<\/span><\/div><div class="product-info"><h3>[^<]*<\/h3><p>([^<]*)<\/p>(?:<span class="stock-badge[^"]*">[^<]*<\/span>)?(?:<span class="product-price">([^<]*)<\/span>)?(?:<span class="qc-badge">[^<]*<\/span>)?(?:<button[\s\S]*?class="vswr-teaser"[\s\S]*?<\/button>)?<\/div><\/div>/g;
   let cm;
   while ((cm = cardRegex.exec(workingHTML)) !== null) {
     const [, id, img, cardText, cardPrice] = cm;
